@@ -7,6 +7,7 @@ from gradient_thresholds import combined_gradient_thresholds
 
 PATH_TO_TEST_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/test_images/'
 
+# hls S channel mask 
 def hls_select(img, thresh=(0, 255)):
     hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
     s_channel = hls[:,:,2]
@@ -14,7 +15,8 @@ def hls_select(img, thresh=(0, 255)):
     binary_output[(s_channel > thresh[0]) & (s_channel <= thresh[1])] = 255
     return binary_output
 
-
+# test on images from test-set.
+# apply combined gradient-thresholds along with color threshold 
 def main():
     path_to_img = PATH_TO_TEST_IMG + 'test5.jpg'
     img = cv2.imread(path_to_img)

@@ -47,6 +47,7 @@ def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     # Return the binary image
     return binary_output
 
+# magnitude threshold. Default values chosen close to suggested optimal
 def mag_thresh(img, sobel_kernel=3, mag_thresh=(30, 100)):
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -72,8 +73,8 @@ def mag_thresh(img, sobel_kernel=3, mag_thresh=(30, 100)):
     # Return the binary image
     return binary_output*255
 
-
-def combined_gradient_thresholds(img,sobel_thresh = (30,120),magnitude_thresh = (30,120),direction_thresh=(0.7,1.3),display=False):
+# apply all color and gradient thresholds and combine them in a binary mask (255,0)
+def combined_gradient_thresholds(img,sobel_thresh = (30,120),magnitude_thresh = (30,120),direction_thresh=(0.8,1.2),display=False):
     ksize=3
 
     gradx = abs_sobel_thresh(img, orient='x', sobel_kernel=ksize, thresh=sobel_thresh)
@@ -89,10 +90,11 @@ def combined_gradient_thresholds(img,sobel_thresh = (30,120),magnitude_thresh = 
         cv2.imshow('Dir_thresh',dir_binary)
    
     combined = np.zeros_like(dir_binary)
-    combined[((gradx >= 250) & (grady >= 250)) | ((mag_binary >= 250) & (dir_binary >= 250))] = 255
+    combined[((gradx >= 240) & (grady >= 240)) | ((mag_binary >= 240) & (dir_binary >= 240))] = 255
 
     return combined
 
+# test on images from test-set
 def main():
     path_to_img = PATH_TO_TEST_IMG + 'test2.jpg'
     img = cv2.imread(path_to_img)

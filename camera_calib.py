@@ -10,14 +10,16 @@ Test_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/camera_cal/test
 nx=9
 ny=6
 
+# convert image from bgr to gray
 def rgb2gray(img):
 	return cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-
+# read images with glob
 def read_calib_images():
 	images = glob.glob(PATH_TO_CALIB_IMG+'calibration*.jpg')
 	return images
 
+# find chessboard corners. Save data
 def getCalibrationStructures():
 	objpoints = []
 	imgpoints = []
@@ -27,7 +29,7 @@ def getCalibrationStructures():
 		img = cv2.imread(file_name)
 		gray = rgb2gray(img)
 		#cv2.imshow('gray',gray)
-		print('-'*40,file_name)
+		#print('-'*40,file_name)
 
 	
 
@@ -41,13 +43,14 @@ def getCalibrationStructures():
 
 			#cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
 			#cv2.imshow(file_name,img)
-			print('*'*20)
-		else:
+			#print('*'*20)
+		#else:
 			#cv2.imshow('error',img)
-			print('Chessboard Error')
+			#print('Chessboard Error')
 
 	return objpoints,imgpoints
 
+# calibrate camera
 def performCalibration(img):
 	
 	gray = rgb2gray(img)

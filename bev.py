@@ -3,7 +3,7 @@ import cv2
 
 PATH_TO_TEST_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/test_images/'
 
-
+# create masked image of interest from vertices. Used for visualising the ROI
 def region_of_interest(img, vertices):
     """
     Applies an image mask.
@@ -28,10 +28,12 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
+# get source and destination points for projection transform.
+# i used a global offset and experimented for best results
 def get_warp_points(imgSize):
 	offset = 100
 	#yoffset = imgSize[1]/2
-	print('ImgSize: ',imgSize)
+	#print('ImgSize: ',imgSize)
 	src = np.float32([
 			[2*offset,imgSize[0]],
 			[imgSize[1]/2-offset+30, imgSize[0]/2+offset],
@@ -47,6 +49,7 @@ def get_warp_points(imgSize):
 
 	return src,dst
 
+# apply perspective transform and return matrix
 def get_inverse_warp(img):
 	imshape = img.shape
 	imgSize = (imshape[0],imshape[1])
@@ -55,6 +58,7 @@ def get_inverse_warp(img):
 	Minv = cv2.getPerspectiveTransform(dst,src)
 	return Minv
 
+# warp image with perspective transform matrix
 def get_warped_image(img):
 
 	imshape = img.shape
@@ -69,6 +73,7 @@ def get_warped_image(img):
 	#cv2.imshow('warped',warped)
 	return warped
 
+# test on images from test-set
 def main():
 	path_to_img = PATH_TO_TEST_IMG + 'test1.jpg'
 	img = cv2.imread(path_to_img)
