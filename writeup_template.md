@@ -10,10 +10,12 @@
 [image5]: ./output_images/4Bev.jpg "Birds Eye Viuew of the Combined Mask"
 [image6]: ./output_images/Undistorted.png "Undistorted side-by-side comparison"
 [image7]: ./output_images/Undistorted-test.png "Undistorted straight lines side-by-side comparison"
+[image8]: ./output_images/exampleLanes.jpg "Lane detection example"
 [video1]: ./output.mp4 "Output Video"
 
 
 ![alt text][image1]
+![alt text][image8]
 
 ### Camera Calibration
 
