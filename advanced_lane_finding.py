@@ -7,7 +7,7 @@ import os
 import imageio
 import matplotlib.pyplot as plt
 from gradient_thresholds import combined_gradient_thresholds
-from color_thresholds import hls_select
+from color_thresholds import combined_color_thresholds
 from camera_calib import performCalibration
 from bev import get_warped_image
 from bev import get_inverse_warp
@@ -24,6 +24,9 @@ blind_search = True
 
 prev_leftFit = []
 prev_rightFit = []
+
+ym_per_pix = 30/720 # meters per pixel in y dimension
+xm_per_pix = 3.7/700 # meteres per pixel in x dimension
 
 
 # find lane lines. Code is mostly duplicate of suggested tutorial
@@ -158,10 +161,13 @@ def findLaneLines(binary_warped):
 	# Now our radius of curvature is in meters
 	#print(left_curverad, 'm', right_curverad, 'm')
 	curvature = (left_curverad+right_curverad)/2.0
-	if (abs(left_curverad-right_curverad)>400):
-		curvature_text = '          off reading'
+
+	center_pos = (width/2.0 - (left_fitx[-1]+right_fitx[2])/2.0)*xm_per_pix
+
+	if (abs(left_curverad-right_curverad)>500):
+		curvature_text = 'Position : {0:.2f} Curve :   not detectable'.format(center_pos)
 	else:
-		curvature_text = '{0:.2f}  | Left : {0:.2f} Right : {0:.2f}'.format(curvature,left_curverad,right_curverad)
+		curvature_text = 'Position : {0:.2f} Curve :   {0:.2f}  | Left : {0:.2f} Right : {0:.2f}'.format(center_pos,curvature,left_curverad,right_curverad)
 	# /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -205,8 +211,9 @@ def process_frame(img):
 		
 
 	undistortedImg = cv2.undistort(img, mtx, dist, None, mtx)
-    #undistortedImg=img.copy()
-	hls_binary = hls_select(undistortedImg, thresh=(170,255))
+	#undistortedImg=img.copy()
+	hls_binary = combined_color_thresholds(undistortedImg, thresh=(170,255))
+
     # gradient / direction / magnitude . sobel thresh
 	combined_binary = combined_gradient_thresholds(undistortedImg,sobel_thresh=(40,120),magnitude_thresh = (40,120),direction_thresh=(0.7,1.3))
     
@@ -218,6 +225,7 @@ def process_frame(img):
 	warped = get_warped_image(threshOut)
 
 	lane_img,ploty,left_fitx,right_fitx,curvature_text = findLaneLines(warped)
+
 
 	warp_zero = np.zeros_like(warped).astype(np.uint8)
 	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
@@ -242,7 +250,7 @@ def process_frame(img):
 
 	result = np.hstack((resultColor,resultBinary))
 
-	cv2.putText(result,curvature_text,(1000,100),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),1)
+	cv2.putText(result,curvature_text,(400,100),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),1)
 
 	if (DISPLAY):
 		#cv2.imshow('0.img',img)
@@ -262,7 +270,7 @@ def main():
 	img = cv2.imread(path_to_img)
 	cv2.imwrite(PATH_TO_OUTPUT_IMAGES+'original.jpg',img)
 
-	hls_binary = hls_select(img, thresh=(200,255))
+	hls_binary = combined_color_thresholds(img, thresh=(200,255))
 	cv2.imwrite(PATH_TO_OUTPUT_IMAGES+'1SChan.jpg',hls_binary)
 	combined_binary = combined_gradient_thresholds(img,sobel_thresh=(30,150),magnitude_thresh = (30,150),direction_thresh=(0.7,1.3))
 
@@ -279,11 +287,12 @@ def main():
 	#cv2.waitKey(0)
 	#cv2.destroyAllWindows()
 
-	#return
+	cv2.imwrite(PATH_TO_OUTPUT_IMAGES+'exampleLanes.jpg',process_frame(img))
+
 
 	path_to_video_file = PATH_TO_VIDEO + 'project_video.mp4'
 	path_to_video_output = PATH_TO_VIDEO + 'output3.mp4'
-	clip = VideoFileClip(path_to_video_file)
+	clip = VideoFileClip(path_to_video_file)#.subclip(38,43)
 
 	# for each frame, process accordingly
 	out_clip = clip.fl_image(process_frame)

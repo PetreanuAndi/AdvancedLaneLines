@@ -8,6 +8,8 @@
 [image3]: ./output_images/2GradientCombined.jpg "Combined Sobel Gradients Mask"
 [image4]: ./output_images/3CombinedThresholds.jpg "Combined Color+Gradient Thresholds"
 [image5]: ./output_images/4Bev.jpg "Birds Eye Viuew of the Combined Mask"
+[image6]: ./output_images/Undistorted.png "Undistorted side-by-side comparison"
+[image7]: ./output_images/Undistorted-test.png "Undistorted straight lines side-by-side comparison"
 [video1]: ./output.mp4 "Output Video"
 
 
@@ -19,10 +21,18 @@ The code i used for camera calibration can be found inside of "camera_calib.py" 
 For a given image, i use the pre-provided chess-board images to "findChessboardCorners" and then compute the calibration parameters/distorsion coefficients from cv2.calibrateCamera method.
 cv2.undistort uses these parameters to yield an undistorted image.
 
+![alt text][image6]
+![alt text][image7]
+
 ### Pipeline (single images)
 
 "gradient_thresholds.py" file contains all the methods required for computing the gradient masks (sobel on X, sobel on Y, direction threshold, magnitude threshold) and a utility "combine_gradient_thresholds" method that takes all of the above and creates a unified binary mask.
 The values for the thresholds were experimentally tweaked, around their suggested values, in order to observe the effect on the binary output.
+
+"color_thresholds.py" file contains all the methods required for computing the color masks ( s channel in hls, b channel in Lab, L channel in Luv),
+and a utility "combine_color_thresholds" method that takes all of the above and creates a unified binary mask from color.
+I perform Hls_binary & (Lab_binary | Luv binary) logical operation in order to obtain my best result.
+The shadow part from the project_video is now properly handled 
 
 After computing a combined_mask, the pipeline extracts the "Birds Eye View" image. (incapsulated in "bev.py" file)
 The warp points for source and destination were computed with the help of an offset of 100 pixels (offset/2, +- other experimentally obtained value) in order to maintain paralel lines (as close as possible) in the perpendicular perspective transform (in the context of straight line on the road)
@@ -47,13 +57,13 @@ The curvature was also computed according to the provided material(line 141 in a
 For video processing I used moviepy.editor VideoFileClip library and constructed a pipeline callback method "process_frame(img)". 
 I had several failed attepts of building this with cv2 methods, but my ffmpeg instalation seemed to cause issues with the reading of the videoCap.
 
-The "provess_frame(img)" callback follows the previously described pipeline (Compute undistorsion params once ---> undistort -> SChannelColorThresh -> CombinedGradientThresh -> BEV -> findLaneLines -> reproject onto original frame) and returns a stacked view of both original image + lane selection and combined_binary_image + lane selection.
+The "provess_frame(img)" callback follows the previously described pipeline (Compute undistorsion params once ---> undistort -> CombinedColorThresh -> CombinedGradientThresh -> BEV -> findLaneLines -> reproject onto original frame) and returns a stacked view of both original image + lane selection and combined_binary_image + lane selection.
 
 This helped me better understand what my pipeline lacks and how to tune my thresholds for optimal result.
 I did not approach the challenging videos (other than viewing results) because i am already very late with my submission.
 
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./output.mp4)
 
 ---
 

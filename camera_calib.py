@@ -6,7 +6,7 @@ import matplotlib.image as mpimg
 import glob
 
 PATH_TO_CALIB_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/camera_cal/'
-Test_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/camera_cal/test_image.jpg'
+Test_IMG = '/home/andi/Desktop/Udacity/CarND-Advanced-Lane-Lines/test_images/straight_lines1.jpg'
 nx=9
 ny=6
 
@@ -57,9 +57,13 @@ def performCalibration(img):
 	objpoints,imgpoints = getCalibrationStructures()
 
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-	#dst = cv2.undistort(img, mtx, dist, None, mtx)
-	#cv2.imshow('UndistortedTest',dst)
+	dst = cv2.undistort(img, mtx, dist, None, mtx)
 
+	#image = np.hstack((img,dst))
+	#cv2.imwrite('./Undistorted.png', image)
+	#cv2.imshow('UndistortedTest',image)
+
+	#cv2.waitKey(0)
 	#cv2.destroyAllWindows()
 	return mtx,dist
 
