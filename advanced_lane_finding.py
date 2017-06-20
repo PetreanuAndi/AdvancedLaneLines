@@ -162,12 +162,12 @@ def findLaneLines(binary_warped):
 	#print(left_curverad, 'm', right_curverad, 'm')
 	curvature = (left_curverad+right_curverad)/2.0
 
-	center_pos = (width/2.0 - (left_fitx[-1]+right_fitx[2])/2.0)*xm_per_pix
+	center_pos = (width/2.0 - (left_fitx[-1]+right_fitx[-1])/2.0)*xm_per_pix
 
-	if (abs(left_curverad-right_curverad)>500):
-		curvature_text = 'Position : {0:.2f} Curve :   not detectable'.format(center_pos)
-	else:
-		curvature_text = 'Position : {0:.2f} Curve :   {0:.2f}  | Left : {0:.2f} Right : {0:.2f}'.format(center_pos,curvature,left_curverad,right_curverad)
+	#if (abs(left_curverad-right_curverad)>500):
+	#	curvature_text = 'Position : {0:.2f} Curve :   not detectable'.format(center_pos)
+	#else:
+	curvature_text = 'Position  {:.2f} Curve    {:.2f}   Left  {:.2f} Right  {:.2f}'.format(center_pos,curvature,left_curverad,right_curverad)
 	# /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -288,7 +288,6 @@ def main():
 	#cv2.destroyAllWindows()
 
 	cv2.imwrite(PATH_TO_OUTPUT_IMAGES+'exampleLanes.jpg',process_frame(img))
-
 
 	path_to_video_file = PATH_TO_VIDEO + 'project_video.mp4'
 	path_to_video_output = PATH_TO_VIDEO + 'output3.mp4'
